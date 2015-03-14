@@ -5,3 +5,5 @@ body {
 canvas {
 	display: block;
 }
+
+#canvas { background:url('../img/example.jpg') }

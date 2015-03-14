@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+	<head>
+		<title>Game</title>
+		<meta charset="utf-8">
+		
+		<link rel="stylesheet" href="style/reset.css">
+		<link rel="stylesheet" href="style/game.css">
+	</head>
+	
+	<body>
+		<canvas id="gameCanvas"></canvas>
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="/js/scripts.min.js"></script>
+        <script>
+        // Initialise the game
+            var socket = io();
+			init(socket);
+			animate();
+		</script>
+	</body>
+</html>
