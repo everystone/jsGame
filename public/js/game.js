@@ -12,7 +12,9 @@ var canvas,			// Canvas DOM element
     buildWall,    //Current buildable wall
     preRender,    //Second canvas, used to pre-render walls.
     mouseX,       //Current mouseX 
-    mouseY;       //Current mouseY
+    mouseY,       //Current mouseY
+    grid;               //The level grid
+
 /**************************************************
 ** GAME INITIALISATION
 **************************************************/
@@ -51,7 +53,26 @@ function init(socket) {
     remotePlayers = [];
     walls = [];
     buildWall = [];
-    
+    grid = []; // 1024
+    size = 20;
+
+    //generate grid
+
+    ctxTemp.beginPath();
+    ctxTemp.strokeStyle = "#ccc";
+    for (var i = 0; i < canvas.width/size; i++) {
+        for(var j = 0; j<canvas.height/size;j++){
+        //draw grid
+        grid[i,j] = {};
+        grid[i,j].block = 0;
+
+        ctxTemp.moveTo(size * i,size * j);
+        ctxTemp.lineTo(size * (i+1), size*j);
+        ctxTemp.moveTo(size * i, size * j);
+        ctxTemp.lineTo(size * i, size*(j+1));
+        }
+    }
+    ctxTemp.stroke();    
 };
 
 
@@ -120,18 +141,20 @@ function onMouseUp(e){
 
 function onMouseDown(e){
     console.log("Mouse down "+e.x+", "+e.y);
-    if(e.button == 0 && !buildmode){
-    buildWall.x = e.x;
-    buildWall.y = e.y;
-    buildmode  = true;
+    if(e.button == 0){
+    buildWall.x = Math.round( (e.x-(size/2)) / size);
+    buildWall.y = Math.round( (e.y-(size/2)) / size);
+    console.log("clicked: "+buildWall.x+","+buildWall.y);
+    onBuildWall(buildWall);
+    socket.emit("build wall", {x:buildWall.x, y:buildWall.y, type:1}); 
     return;
     }
-        buildWall.x2 = (e.x);
-        buildWall.y2 = (e.y);
-        socket.emit("build wall", {x:buildWall.x,y:buildWall.y,x2:buildWall.x2,y2:buildWall.y2});
-        onBuildWall(buildWall);
-        buildWall.x = -1;  
-        buildmode = false; 
+       // buildWall.x2 = (e.x);
+        //buildWall.y2 = (e.y);
+        //socket.emit("build wall", {x:buildWall.x,y:buildWall.y,x2:buildWall.x2,y2:buildWall.y2});
+        //onBuildWall(buildWall);
+        //buildWall.x = -1;  
+        //buildmode = false; 
 
 }
 function onMouseMove(e){
@@ -171,19 +194,11 @@ function onMovePlayer(data) {
 
 //Construct wall
 function onBuildWall(data){
-    var wall = new Wall(data.x, data.y, data.x2, data.y2);
-    walls.push(wall);
-
-    //Pre render
-    ctxTemp.beginPath(); 
-    //Mark walls ( lineTo )
-    for(i=0;i<walls.length;i++){
-        walls[i].draw(ctxTemp);
-    }
-    ctxTemp.stroke(); //draws the walls.
-        console.log("Wall built. "+data.x+"," +data.y+", "+data.x2+", "+data.y2);
-        console.log("tatal walls: "+walls.length);
-        console.dir(walls); 
+    grid[data.x, data.y].block = data.block;
+    ctxTemp.fillRect(data.x*size, data.y*size, 20, 20);
+}
+function onDestroyWall(data){
+    grid[data.x,data.y].block = 0;
 }
 
 function onRemovePlayer(data) {

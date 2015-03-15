@@ -1,0 +1,18 @@
+blue lines: walls
+green lines: doors ( enemies cant open, player moves through)
+
+
+
+gameplay:
+
+player starts with X cm wall, can build whatever, base. can place doors ( green line ). 
+day/night cycle. day = white background, night = black background.
+zombies spawn at night. Uses pathfinding to try to get to the player. Players must come out during day to harvest more resources ( walls, doors ).
+
+Crafting: traps,
+
+
+
+pvp: 
+
+players must try to maze zombies into the others base.
