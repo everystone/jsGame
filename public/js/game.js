@@ -40,7 +40,7 @@ function init(socket) {
 		startY = Math.round(Math.random()*(canvas.height-5));
 
 	// Initialise the local player
-	localPlayer = new Player(startX, startY);
+	localPlayer = new Player(startX, startY, ctx);
 
 	// Start listening for events
 	setEventHandlers();
@@ -238,6 +238,7 @@ function draw() {
  }
 
 };
+
 
 
 /** HELPER FUNCTIONS */

@@ -18,12 +18,6 @@ var Wall = function(startX, startY, endX, endY) {
         return y;
     };
 
-    var setX2 = function(xtwo){
-        x2 = xtwo
-    };
-    var setY2 = function(ytwo){
-        y2 = ytwo;
-    ;}
 	
     var draw = function(ctx) {
 	    //ctx.fillRect(x-5, y-5, 10, 10);
@@ -32,6 +26,7 @@ var Wall = function(startX, startY, endX, endY) {
               //ctx.fillTo(x2, y2);
               ctx.lineTo(x2, y2);
               ctx.lineWidth = 5;
+              ctx.strokeStyle='#cc0000';
              // ctx.stroke();
 	};
 
@@ -39,8 +34,6 @@ var Wall = function(startX, startY, endX, endY) {
 	return {
         getX: getX,
         getY: getY,
-        setX2: setX2,
-        setY2: setY2,
 	draw: draw
 
 	}
