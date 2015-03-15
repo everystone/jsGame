@@ -25,8 +25,8 @@ var Wall = function(startX, startY, endX, endY) {
               ctx.moveTo(x, y);
               //ctx.fillTo(x2, y2);
               ctx.lineTo(x2, y2);
-              ctx.lineWidth = 5;
-              ctx.strokeStyle='#cc0000';
+              ctx.lineWidth = 3;
+              ctx.strokeStyle='#72A4B0';
              // ctx.stroke();
 	};
 

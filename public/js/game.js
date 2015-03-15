@@ -84,6 +84,12 @@ var setEventHandlers = function() {
 
 // Keyboard key down
 function onKeydown(e) {
+        //Check for Esc
+        if(e.keyCode == 27){
+            buildmode=false;
+            console.log("build canceled");
+        }
+
 	if (localPlayer) {
 		keys.onKeyDown(e);
 	};
@@ -105,21 +111,28 @@ function onResize(e) {
 
 function onMouseUp(e){
     console.log("Mouse Up "+e.x+", "+e.y);
-    if(buildWall.x != -1){
-        buildWall.x2 = (e.x);
-        buildWall.y2 = (e.y);
-        socket.emit("build wall", {x:buildWall.x,y:buildWall.y,x2:buildWall.x2,y2:buildWall.y2});
-        onBuildWall(buildWall);
-        buildWall.x = -1;   
+    console.dir(e);
+    if(e.button == 2){ //rightclick, cancel build
+        buildmode = false;
+        return;
     }
-    buildmode = false;
 }
 
 function onMouseDown(e){
     console.log("Mouse down "+e.x+", "+e.y);
+    if(e.button == 0 && !buildmode){
     buildWall.x = e.x;
     buildWall.y = e.y;
     buildmode  = true;
+    return;
+    }
+        buildWall.x2 = (e.x);
+        buildWall.y2 = (e.y);
+        socket.emit("build wall", {x:buildWall.x,y:buildWall.y,x2:buildWall.x2,y2:buildWall.y2});
+        onBuildWall(buildWall);
+        buildWall.x = -1;  
+        buildmode = false; 
+
 }
 function onMouseMove(e){
     mouseX = e.x;
