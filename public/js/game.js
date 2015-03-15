@@ -10,8 +10,9 @@ var canvas,			// Canvas DOM element
     walls,          //Walls
     buildmode,      //Are we in buildmode?
     buildWall,    //Current buildable wall
-    preRender;    //Second canvas, used to pre-render walls.
-
+    preRender,    //Second canvas, used to pre-render walls.
+    mouseX,       //Current mouseX 
+    mouseY;       //Current mouseY
 /**************************************************
 ** GAME INITIALISATION
 **************************************************/
@@ -111,15 +112,18 @@ function onMouseUp(e){
         onBuildWall(buildWall);
         buildWall.x = -1;   
     }
+    buildmode = false;
 }
 
 function onMouseDown(e){
     console.log("Mouse down "+e.x+", "+e.y);
     buildWall.x = e.x;
     buildWall.y = e.y;
+    buildmode  = true;
 }
 function onMouseMove(e){
-
+    mouseX = e.x;
+    mouseY = e.y;
 }
 
 
@@ -201,6 +205,8 @@ function update() {
 	if(localPlayer.update(keys)){
         socket.emit("move player", {x: localPlayer.getX(), y: localPlayer.getY()});
     }
+
+                
 };
 
 
@@ -222,6 +228,14 @@ function draw() {
     for(i=0;i<remotePlayers.length;i++){
         remotePlayers[i].draw(ctx);
     }
+
+    //if in buildmode, draw current wall in progress
+    if(buildmode){
+        ctx.beginPath();
+        ctx.moveTo(buildWall.x, buildWall.y);
+        ctx.lineTo(mouseX, mouseY);
+        ctx.stroke();   
+ }
 
 };
 
