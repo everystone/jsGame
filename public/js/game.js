@@ -6,7 +6,11 @@ var canvas,			// Canvas DOM element
 	keys,			// Keyboard input
 	localPlayer,	// Local player
     remotePlayers,  // Remote players
-    socket;         // Websocket
+    socket,         // Websocket
+    walls,          //Walls
+    buildmode,      //Are we in buildmode?
+    buildWall,    //Current buildable wall
+    preRender;    //Second canvas, used to pre-render walls.
 
 /**************************************************
 ** GAME INITIALISATION
@@ -14,13 +18,18 @@ var canvas,			// Canvas DOM element
 function init(socket) {
 	// Declare the canvas and rendering context
 	canvas = document.getElementById("gameCanvas");
-	ctx = canvas.getContext("2d");
+        //canvasTemp = document.createElement("canvas");
+        canvasTemp = document.getElementById("canvas");
+         ctx = canvas.getContext("2d");
+        ctxTemp = canvasTemp.getContext("2d");
 
 	// Maximise the canvas
 	canvas.width = window.innerWidth;
 	canvas.height = window.innerHeight;
 
-	// Initialise keyboard controls
+	canvasTemp.width = canvas.width;
+        canvasTemp.height = canvas.height;
+        // Initialise keyboard controls
 	keys = new Keys();
 
 	// Calculate a random start position for the local player
@@ -39,6 +48,9 @@ function init(socket) {
     this.socket = socket;
 
     remotePlayers = [];
+    walls = [];
+    buildWall = [];
+    
 };
 
 
@@ -50,6 +62,11 @@ var setEventHandlers = function() {
 	window.addEventListener("keydown", onKeydown, false);
 	window.addEventListener("keyup", onKeyup, false);
 
+        //Mouse
+        canvas.addEventListener("mousedown", onMouseDown, false);
+        canvas.addEventListener("mouseup", onMouseUp, false);
+        canvas.addEventListener("mousemove", onMouseMove, false);        
+
 	// Window resize
 	window.addEventListener("resize", onResize, false);
 
@@ -59,6 +76,9 @@ var setEventHandlers = function() {
     socket.on("new player", onNewPlayer);
     socket.on("move player", onMovePlayer);
     socket.on("remove player", onRemovePlayer);
+    
+    socket.on("build wall", onBuildWall);
+
 };
 
 // Keyboard key down
@@ -81,6 +101,27 @@ function onResize(e) {
 	canvas.width = window.innerWidth;
 	canvas.height = window.innerHeight;
 };
+
+function onMouseUp(e){
+    console.log("Mouse Up "+e.x+", "+e.y);
+    if(buildWall.x != -1){
+        buildWall.x2 = (e.x);
+        buildWall.y2 = (e.y);
+        socket.emit("build wall", {x:buildWall.x,y:buildWall.y,x2:buildWall.x2,y2:buildWall.y2});
+        onBuildWall(buildWall);
+        buildWall.x = -1;   
+    }
+}
+
+function onMouseDown(e){
+    console.log("Mouse down "+e.x+", "+e.y);
+    buildWall.x = e.x;
+    buildWall.y = e.y;
+}
+function onMouseMove(e){
+
+}
+
 
 function onSocketConnected() {
     console.log("Connected to socket server");
@@ -110,6 +151,23 @@ function onMovePlayer(data) {
     player.setX(data.x);
     player.setY(data.y);
 };
+
+//Construct wall
+function onBuildWall(data){
+    var wall = new Wall(data.x, data.y, data.x2, data.y2);
+    walls.push(wall);
+
+    //Pre render
+    ctxTemp.beginPath(); 
+    //Mark walls ( lineTo )
+    for(i=0;i<walls.length;i++){
+        walls[i].draw(ctxTemp);
+    }
+    ctxTemp.stroke(); //draws the walls.
+        console.log("Wall built. "+data.x+"," +data.y+", "+data.x2+", "+data.y2);
+        console.log("tatal walls: "+walls.length);
+        console.dir(walls); 
+}
 
 function onRemovePlayer(data) {
     //Find player by id
@@ -152,6 +210,9 @@ function update() {
 function draw() {
 	// Wipe the canvas clean
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        //Draw the pre-rendered Wall canvas
+       ctx.drawImage(canvasTemp, 0, 0); 
 
 	// Draw the local player
 	localPlayer.draw(ctx);

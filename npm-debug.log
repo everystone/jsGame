@@ -1,28 +1,140 @@
 0 info it worked if it ends with ok
-1 verbose cli [ '/home/everystone/local/bin/node',
-1 verbose cli   '/home/everystone/local/bin/npm',
-1 verbose cli   'start' ]
+1 verbose cli [ '/usr/bin/node', '/usr/bin/npm', 'install', '-g', 'uglifyjs' ]
 2 info using npm@1.4.28
 3 info using node@v0.10.36
-4 verbose run-script [ 'prestart', 'start', 'poststart' ]
-5 info prestart game@0.0.0
-6 info start game@0.0.0
-7 verbose unsafe-perm in lifecycle true
-8 info game@0.0.0 Failed to exec start script
-9 error game@0.0.0 start: `node ./bin/www`
-9 error Exit status 8
-10 error Failed at the game@0.0.0 start script.
-10 error This is most likely a problem with the game package,
-10 error not with npm itself.
-10 error Tell the author that this fails on your system:
-10 error     node ./bin/www
-10 error You can get their info via:
-10 error     npm owner ls game
-10 error There is likely additional logging output above.
-11 error System Linux 3.2.0-24-virtual
-12 error command "/home/everystone/local/bin/node" "/home/everystone/local/bin/npm" "start"
-13 error cwd /home/everystone/code/node/game
-14 error node -v v0.10.36
-15 error npm -v 1.4.28
-16 error code ELIFECYCLE
-17 verbose exit [ 1, true ]
+4 verbose node symlink /usr/bin/node
+5 verbose cache add [ 'uglifyjs', null ]
+6 verbose cache add name=undefined spec="uglifyjs" args=["uglifyjs",null]
+7 verbose parsed url { protocol: null,
+7 verbose parsed url   slashes: null,
+7 verbose parsed url   auth: null,
+7 verbose parsed url   host: null,
+7 verbose parsed url   port: null,
+7 verbose parsed url   hostname: null,
+7 verbose parsed url   hash: null,
+7 verbose parsed url   search: null,
+7 verbose parsed url   query: null,
+7 verbose parsed url   pathname: 'uglifyjs',
+7 verbose parsed url   path: 'uglifyjs',
+7 verbose parsed url   href: 'uglifyjs' }
+8 silly lockFile d5e21dcb-uglifyjs uglifyjs
+9 verbose lock uglifyjs /home/eirik/.npm/d5e21dcb-uglifyjs.lock
+10 silly lockFile d5e21dcb-uglifyjs uglifyjs
+11 silly lockFile d5e21dcb-uglifyjs uglifyjs
+12 verbose addNamed [ 'uglifyjs', '' ]
+13 verbose addNamed [ null, '*' ]
+14 silly lockFile 34c129b9-uglifyjs uglifyjs@
+15 verbose lock uglifyjs@ /home/eirik/.npm/34c129b9-uglifyjs.lock
+16 silly addNameRange { name: 'uglifyjs', range: '*', hasData: false }
+17 verbose request where is /uglifyjs
+18 verbose request registry https://registry.npmjs.org/
+19 verbose request id ddb457a5ec7a17cf
+20 verbose url raw /uglifyjs
+21 verbose url resolving [ 'https://registry.npmjs.org/', './uglifyjs' ]
+22 verbose url resolved https://registry.npmjs.org/uglifyjs
+23 verbose request where is https://registry.npmjs.org/uglifyjs
+24 info trying registry request attempt 1 at 01:53:05
+25 verbose etag "B1I64M9TTCMTC6W1K96QLGB9F"
+26 http GET https://registry.npmjs.org/uglifyjs
+27 http 304 https://registry.npmjs.org/uglifyjs
+28 silly registry.get cb [ 304,
+28 silly registry.get   { date: 'Sat, 14 Mar 2015 00:53:06 GMT',
+28 silly registry.get     server: 'Apache',
+28 silly registry.get     via: '1.1 varnish',
+28 silly registry.get     'last-modified': 'Sat, 14 Mar 2015 00:53:06 GMT',
+28 silly registry.get     'cache-control': 'max-age=60',
+28 silly registry.get     etag: '"B1I64M9TTCMTC6W1K96QLGB9F"',
+28 silly registry.get     age: '37',
+28 silly registry.get     'x-served-by': 'cache-ams4139-AMS',
+28 silly registry.get     'x-cache': 'HIT',
+28 silly registry.get     'x-cache-hits': '1',
+28 silly registry.get     'x-timer': 'S1426294386.003587,VS0,VE0',
+28 silly registry.get     vary: 'Accept',
+28 silly registry.get     'content-length': '0',
+28 silly registry.get     'keep-alive': 'timeout=10, max=50',
+28 silly registry.get     connection: 'Keep-Alive' } ]
+29 verbose etag https://registry.npmjs.org/uglifyjs from cache
+30 silly addNameRange number 2 { name: 'uglifyjs', range: '*', hasData: true }
+31 silly addNameRange versions [ 'uglifyjs', [ '2.4.10' ] ]
+32 verbose addNamed [ 'uglifyjs', '2.4.10' ]
+33 verbose addNamed [ '2.4.10', '2.4.10' ]
+34 silly lockFile 2737365b-uglifyjs-2-4-10 uglifyjs@2.4.10
+35 verbose lock uglifyjs@2.4.10 /home/eirik/.npm/2737365b-uglifyjs-2-4-10.lock
+36 silly lockFile 2737365b-uglifyjs-2-4-10 uglifyjs@2.4.10
+37 silly lockFile 2737365b-uglifyjs-2-4-10 uglifyjs@2.4.10
+38 silly lockFile 34c129b9-uglifyjs uglifyjs@
+39 silly lockFile 34c129b9-uglifyjs uglifyjs@
+40 silly resolved [ { name: 'uglifyjs',
+40 silly resolved     description: 'JavaScript parser, mangler/compressor and beautifier toolkit',
+40 silly resolved     homepage: 'http://lisperator.net/uglifyjs',
+40 silly resolved     main: 'tools/node.js',
+40 silly resolved     version: '2.4.10',
+40 silly resolved     engines: { node: '>=0.4.0' },
+40 silly resolved     maintainers: [ [Object] ],
+40 silly resolved     repository: { type: 'git', url: 'https://github.com/mishoo/UglifyJS2.git' },
+40 silly resolved     dependencies:
+40 silly resolved      { async: '~0.2.6',
+40 silly resolved        'source-map': '0.1.34',
+40 silly resolved        yargs: '~1.3.3',
+40 silly resolved        'uglify-to-browserify': '~1.0.0' },
+40 silly resolved     devDependencies:
+40 silly resolved      { acorn: '~0.6.0',
+40 silly resolved        escodegen: '~1.3.3',
+40 silly resolved        esfuzz: '~0.3.1',
+40 silly resolved        estraverse: '~1.5.1' },
+40 silly resolved     browserify: { transform: [Object] },
+40 silly resolved     bin: { uglifyjs: 'bin/uglifyjs' },
+40 silly resolved     license: 'BSD',
+40 silly resolved     scripts: { test: 'node test/run-tests.js' },
+40 silly resolved     gitHead: '9de7199b88edb37753a36a9688d34a4be801f41b',
+40 silly resolved     bugs: { url: 'https://github.com/mishoo/UglifyJS2/issues' },
+40 silly resolved     _id: 'uglifyjs@2.4.10',
+40 silly resolved     _shasum: '632927319fa6a3da3fc91f9773ac27bfe6c3ee92',
+40 silly resolved     _from: 'uglifyjs@',
+40 silly resolved     _npmVersion: '2.5.1',
+40 silly resolved     _nodeVersion: '0.12.0',
+40 silly resolved     _npmUser: { name: 'mytry', email: 'mytry@126.com' },
+40 silly resolved     dist:
+40 silly resolved      { shasum: '632927319fa6a3da3fc91f9773ac27bfe6c3ee92',
+40 silly resolved        tarball: 'http://registry.npmjs.org/uglifyjs/-/uglifyjs-2.4.10.tgz' },
+40 silly resolved     directories: {},
+40 silly resolved     _resolved: 'https://registry.npmjs.org/uglifyjs/-/uglifyjs-2.4.10.tgz',
+40 silly resolved     readme: 'ERROR: No README data found!' } ]
+41 info install uglifyjs@2.4.10 into /usr/lib
+42 info installOne uglifyjs@2.4.10
+43 verbose lib/node_modules/uglifyjs unbuild
+44 verbose tar unpack /home/eirik/.npm/uglifyjs/2.4.10/package.tgz
+45 silly lockFile 69dcf781-ar-usr-lib-node-modules-uglifyjs tar:///usr/lib/node_modules/uglifyjs
+46 verbose lock tar:///usr/lib/node_modules/uglifyjs /home/eirik/.npm/69dcf781-ar-usr-lib-node-modules-uglifyjs.lock
+47 silly lockFile c3462996--npm-uglifyjs-2-4-10-package-tgz tar:///home/eirik/.npm/uglifyjs/2.4.10/package.tgz
+48 verbose lock tar:///home/eirik/.npm/uglifyjs/2.4.10/package.tgz /home/eirik/.npm/c3462996--npm-uglifyjs-2-4-10-package-tgz.lock
+49 silly gunzTarPerm modes [ '775', '664' ]
+50 error Error: EACCES, mkdir '/usr/lib/node_modules/uglifyjs'
+50 error  { [Error: EACCES, mkdir '/usr/lib/node_modules/uglifyjs']
+50 error   errno: 3,
+50 error   code: 'EACCES',
+50 error   path: '/usr/lib/node_modules/uglifyjs',
+50 error   fstream_type: 'Directory',
+50 error   fstream_path: '/usr/lib/node_modules/uglifyjs',
+50 error   fstream_class: 'DirWriter',
+50 error   fstream_stack:
+50 error    [ '/usr/lib/node_modules/npm/node_modules/fstream/lib/dir-writer.js:36:23',
+50 error      '/usr/lib/node_modules/npm/node_modules/mkdirp/index.js:46:53',
+50 error      'Object.oncomplete (fs.js:108:15)' ] }
+51 error Please try running this command again as root/Administrator.
+52 error System Linux 3.10.18
+53 error command "/usr/bin/node" "/usr/bin/npm" "install" "-g" "uglifyjs"
+54 error cwd /home/eirik/code/js/jsGame
+55 error node -v v0.10.36
+56 error npm -v 1.4.28
+57 error path /usr/lib/node_modules/uglifyjs
+58 error fstream_path /usr/lib/node_modules/uglifyjs
+59 error fstream_type Directory
+60 error fstream_class DirWriter
+61 error code EACCES
+62 error errno 3
+63 error stack Error: EACCES, mkdir '/usr/lib/node_modules/uglifyjs'
+64 error fstream_stack /usr/lib/node_modules/npm/node_modules/fstream/lib/dir-writer.js:36:23
+64 error fstream_stack /usr/lib/node_modules/npm/node_modules/mkdirp/index.js:46:53
+64 error fstream_stack Object.oncomplete (fs.js:108:15)
+65 verbose exit [ 3, true ]

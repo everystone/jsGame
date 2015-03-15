@@ -20,6 +20,7 @@ module.exports = function (io) {
         client.on("disconnect", onClientDisconnect);
         client.on("new player", onNewPlayer);
         client.on("move player", onMovePlayer);
+        client.on("build wall", onBuildWall);
     }
 
     function onClientDisconnect(){
@@ -63,6 +64,13 @@ module.exports = function (io) {
         //Tell others that player moved
         this.broadcast.emit('move player', {id: player.id, x: player.getX(), y: player.getY()});
 
+    }
+
+    /* Build Wall */
+    function onBuildWall(data){
+    
+    //Broadcast to everyone that a wall is built.
+    this.broadcast.emit("build wall", data);
     }
 
     /** Helper functions */
