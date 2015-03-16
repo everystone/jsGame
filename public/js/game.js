@@ -101,14 +101,15 @@ function drawPath(ctx){
 
     //Draw currentPath
     ctx.beginPath();
-    ctx.fillStyle = "E8E676"; //#ccc
+   // ctx.fillStyle = "#E8E676"; //#ccc
+    ctx.moveTo(10, 10); //enemy spawn
     for(i =0;i<currentPath.length;i++){
 
         var x,y;
         xy = currentPath[i];
-       // y = currentPath[i][0];
         //console.log("path: "+xy);
-        ctx.fillRect(xy[0]*size, xy[1]*size, size, size);
+        ctx.lineTo(xy[0]*size+(size/2), xy[1]*size+(size/2));
+       // ctx.fillRect(xy[0]*size, xy[1]*size, size, size);
     }
     ctx.stroke();
 }
