@@ -12,14 +12,16 @@
 	
 	<body>
 		<canvas id="gameCanvas"></canvas>
-                <canvas id="canvas"></canvas>
+        <canvas id="canvas"></canvas> <!-- used to pre-render -->
         <script src="/socket.io/socket.io.js"></script>
-                <script src="js/three.min.js"></script>
+
 		<script src="js/requestAnimationFrame.js"></script>
 		<script src="js/Keys.js"></script>
-                <script src="js/Wall.js"></script>
+        <script src="js/Wall.js"></script>
+        <script src="js/pathfinding-browser.min.js"></script>
 		<script src="js/Player.js"></script>
 		<script src="js/game.js"></script>
+
 		<script>
 			// Initialise the game
             var socket = io();

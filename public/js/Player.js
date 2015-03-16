@@ -48,7 +48,7 @@ var Player = function(startX, startY, context) {
                         if(collision(x-8, y))
                             return false;
 			x -= moveAmount;
-                        
+
 		} else if (keys.right) {
                         if(collision(x+5, y))
                             return false;
@@ -60,6 +60,7 @@ var Player = function(startX, startY, context) {
 	};
 
 	var draw = function(ctx) {
+        ctx.fillStyle = "#000";
 		ctx.fillRect(x-5, y-5, 10, 10);
 	};
 
@@ -87,7 +88,7 @@ function collision(x, y) {
 
         // Loop through the clip and see if you find red or blue. 
         for (var i = 0; i < clipLength * 4; i += 4) {
-         console.log(whatColor.data[i]);
+         //console.log(whatColor.data[i]);
          if (whatColor.data[i] == 242) {
            // alert("red");
             return true;

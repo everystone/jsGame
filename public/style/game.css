@@ -6,4 +6,7 @@ canvas {
 	display: block;
 }
 
-#canvas { background:url('../img/example.jpg') }
+#gameCanvas {
+    /*background:url('../img/example.jpg')*/
+    background-color: #b8ffaf;
+}

@@ -10,10 +10,11 @@ var canvas,			// Canvas DOM element
     walls,          //Walls
     buildmode,      //Are we in buildmode?
     buildWall,    //Current buildable wall
-    preRender,    //Second canvas, used to pre-render walls.
-    mouseX,       //Current mouseX 
-    mouseY,       //Current mouseY
-    grid;               //The level grid
+    worldWidth,       //Current mouseX
+    worldHeight,       //Current mouseY
+    grid;            //The level gri
+// Pathfinding.
+var pfGrid, pfGridBackup, finder;
 
 /**************************************************
 ** GAME INITIALISATION
@@ -27,8 +28,19 @@ function init(socket) {
         ctxTemp = canvasTemp.getContext("2d");
 
 	// Maximise the canvas
-	canvas.width = window.innerWidth;
-	canvas.height = window.innerHeight;
+	//canvas.width = window.innerWidth;
+	//canvas.height = window.innerHeight;
+    grid = []; // 1024
+    size = 20;
+    worldWidth = 50;
+    worldHeight = 30;
+
+    finder = new PF.AStarFinder();
+    currentPath = [];
+
+
+    canvas.width = worldWidth * size;
+    canvas.height = worldHeight * size;
 
 	canvasTemp.width = canvas.width;
         canvasTemp.height = canvas.height;
@@ -53,8 +65,7 @@ function init(socket) {
     remotePlayers = [];
     walls = [];
     buildWall = [];
-    grid = []; // 1024
-    size = 20;
+
 
     drawGrid();
 };
@@ -62,15 +73,20 @@ function init(socket) {
 
 function drawGrid(){
     //generate grid
+    pfGrid = new PF.Grid(worldWidth, worldHeight);
 
     ctxTemp.beginPath();
     ctxTemp.strokeStyle = "#ccc"; //#ccc
-    for (var i = 0; i < canvas.width/size; i++) {
-        for(var j = 0; j<canvas.height/size;j++){
-        //draw grid
+    for (var i = 0; i < worldWidth; i++) {
+        for(var j = 0; j<worldHeight;j++){
+
+            /* Initialize arrays */
         grid[i,j] = {};
         grid[i,j].block = 0;
 
+        pfGrid.setWalkableAt(i, j, true);
+
+         //draw grid
         ctxTemp.moveTo(size * i,size * j);
         ctxTemp.lineTo(size * (i+1), size*j);
         ctxTemp.moveTo(size * i, size * j);
@@ -79,6 +95,22 @@ function drawGrid(){
     }
     ctxTemp.stroke();    
 
+}
+
+function drawPath(ctx){
+
+    //Draw currentPath
+    ctx.beginPath();
+    ctx.fillStyle = "E8E676"; //#ccc
+    for(i =0;i<currentPath.length;i++){
+
+        var x,y;
+        xy = currentPath[i];
+       // y = currentPath[i][0];
+        //console.log("path: "+xy);
+        ctx.fillRect(xy[0]*size, xy[1]*size, size, size);
+    }
+    ctx.stroke();
 }
 
 /**************************************************
@@ -131,25 +163,28 @@ function onKeyup(e) {
 // Browser window resize
 function onResize(e) {
 	// Maximise the canvas
-	canvas.width = window.innerWidth;
-	canvas.height = window.innerHeight;
+	//canvas.width = window.innerWidth;
+	//canvas.height = window.innerHeight;
+
 };
 
 function onMouseUp(e){
-    console.log("Mouse Up "+e.x+", "+e.y);
-    console.dir(e);
-    if(e.button == 2){ //rightclick, cancel build
+    //console.log("Mouse Up "+e.x+", "+e.y);
+    //console.dir(e);
+    //if(e.button == 2){ //rightclick, cancel build
         buildmode = false;
         return;
-    }
+    //}
 }
 
 function onMouseDown(e){
-    console.log("Mouse down "+e.x+", "+e.y);
+    //console.log("Mouse down "+e.x+", "+e.y);
     if(e.button == 0){
+        buildmode = true;
     buildWall.x = Math.round( (e.x-(size/2)) / size);
     buildWall.y = Math.round( (e.y-(size/2)) / size);
-    console.log("clicked: "+buildWall.x+","+buildWall.y);
+    //console.log("clicked: "+buildWall.x+","+buildWall.y);
+    buildWall.block = 1;
     onBuildWall(buildWall);
     socket.emit("build wall", {x:buildWall.x, y:buildWall.y, type:1}); 
     return;
@@ -163,8 +198,16 @@ function onMouseDown(e){
 
 }
 function onMouseMove(e){
-    mouseX = e.x;
-    mouseY = e.y;
+
+    if(buildmode){
+        buildWall.x = Math.round( (e.x-(size/2)) / size);
+        buildWall.y = Math.round( (e.y-(size/2)) / size);
+        buildWall.block = 1;
+        //console.log("Mousemove: "+buildWall.x+","+buildWall.y);
+        onBuildWall(buildWall);
+        socket.emit("build wall", {x:buildWall.x, y:buildWall.y, type:1});
+        return;
+    }
 }
 
 
@@ -202,6 +245,18 @@ function onBuildWall(data){
     grid[data.x, data.y].block = data.block;
     ctxTemp.fillStyle = "#F2AA0F";
     ctxTemp.fillRect(data.x*size, data.y*size, 20, 20);
+
+    pfGrid.setWalkableAt(data.x, data.y, false);
+
+    //Backup pfGrid
+    pfGridBackup = pfGrid.clone();
+
+    //Calculate new npc path
+    currentPath = finder.findPath(10, 10, Math.round(localPlayer.getX()/size), Math.round(localPlayer.getY()/size), pfGrid);
+
+    //Restore grid
+    pfGrid = pfGridBackup.clone();
+
 }
 function onDestroyWall(data){
     grid[data.x,data.y].block = 0;
@@ -237,6 +292,7 @@ function animate() {
 function update() {
     //Do player input, and, if position is changed, tell server
 	if(localPlayer.update(keys)){
+
         socket.emit("move player", {x: localPlayer.getX(), y: localPlayer.getY()});
     }
 
@@ -251,8 +307,8 @@ function draw() {
 	// Wipe the canvas clean
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        //Draw the pre-rendered Wall canvas
-       ctx.drawImage(canvasTemp, 0, 0); 
+    //Draw the pre-rendered Wall canvas
+       ctx.drawImage(canvasTemp, 0, 0);
 
 	// Draw the local player
 	localPlayer.draw(ctx);
@@ -263,15 +319,21 @@ function draw() {
         remotePlayers[i].draw(ctx);
     }
 
+    //Draw pathfinding
+    drawPath(ctx);
+
     //if in buildmode, draw current wall in progress
+  /*
     if(buildmode){
         ctx.beginPath();
         ctx.moveTo(buildWall.x, buildWall.y);
         ctx.lineTo(mouseX, mouseY);
         ctx.stroke();   
- }
+ }*/
 
 };
+
+
 
 
 
