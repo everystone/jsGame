@@ -87,8 +87,8 @@ function collision(x, y) {
 
         // Loop through the clip and see if you find red or blue. 
         for (var i = 0; i < clipLength * 4; i += 4) {
-         //console.log(whatColor.data[i]);
-         if (whatColor.data[i] > 10) {
+         console.log(whatColor.data[i]);
+         if (whatColor.data[i] == 242) {
            // alert("red");
             return true;
             break;

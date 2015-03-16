@@ -56,10 +56,15 @@ function init(socket) {
     grid = []; // 1024
     size = 20;
 
+    drawGrid();
+};
+
+
+function drawGrid(){
     //generate grid
 
     ctxTemp.beginPath();
-    ctxTemp.strokeStyle = "#ccc";
+    ctxTemp.strokeStyle = "#ccc"; //#ccc
     for (var i = 0; i < canvas.width/size; i++) {
         for(var j = 0; j<canvas.height/size;j++){
         //draw grid
@@ -73,8 +78,8 @@ function init(socket) {
         }
     }
     ctxTemp.stroke();    
-};
 
+}
 
 /**************************************************
 ** GAME EVENT HANDLERS
@@ -195,6 +200,7 @@ function onMovePlayer(data) {
 //Construct wall
 function onBuildWall(data){
     grid[data.x, data.y].block = data.block;
+    ctxTemp.fillStyle = "#F2AA0F";
     ctxTemp.fillRect(data.x*size, data.y*size, 20, 20);
 }
 function onDestroyWall(data){
