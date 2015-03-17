@@ -5,13 +5,15 @@
 	<head>
 		<title>Game</title>
 		<meta charset="utf-8">
-		
+        <link rel="stylesheet" href="style/bootstrap.min.css">
 		<link rel="stylesheet" href="style/reset.css">
 		<link rel="stylesheet" href="style/game.css">
 	</head>
 	
-	<body>
-		<canvas id="gameCanvas"></canvas>
+    <body>
+        <div class="container">
+            <canvas id="gameCanvas"></canvas>
+        </div>
         <canvas id="canvas"></canvas> <!-- used to pre-render -->
         <script src="/socket.io/socket.io.js"></script>
 

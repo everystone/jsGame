@@ -199,12 +199,10 @@ function onResize(e) {
 
 function onMouseUp(e){
         buildmode = false;
-
 }
 
 
 function buildBlock(e, type){
-
     var block = blockAt(e.x, e.y);
     onBuildBlock(block);
     socket.emit("build block", block);
@@ -218,23 +216,32 @@ function onMouseDown(e){
     if(e.button != 0)
         return;
 
+    var mouse = {};
+    mouse.x = e.x - canvas.offsetLeft;
+    mouse.y = e.y - canvas.offsetTop;
+
+
     // Clicked empty block
-    if( blockAt(e.x, e.y).type == 0){
+    if( blockAt(mouse.x, mouse.y).type == 0){
         buildmode = true;
-        buildBlock(e, 1);
+        buildBlock(mouse, 1);
     }else {
         //Clicked existing wall, remove it.
-        socket.emit("destroy block", blockAt(e.x, e.y))
-        onDestroyBlock(blockAt(e.x, e.y));;
+        socket.emit("destroy block", blockAt(mouse.x, mouse.y))
+        onDestroyBlock(blockAt(mouse.x, mouse.y));;
     }
 
 }
 function onMouseMove(e){
     if(!buildmode)
         return;
-        //@TODO: check what type of block to build.
-        buildBlock(e, 1);
+        
+    var mouse = {};
+    mouse.x = e.x - canvas.offsetLeft;
+    mouse.y = e.y - canvas.offsetTop;
 
+        //@TODO: check what type of block to build.
+        buildBlock(mouse, 1);
 }
 
 
