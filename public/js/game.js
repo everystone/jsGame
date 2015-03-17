@@ -67,23 +67,25 @@ function init(socket) {
     buildWall = [];
 
 
-    drawGrid();
+    createGrid();
 };
 
 
-function drawGrid(){
+function createGrid(){
     //generate grid
     pfGrid = new PF.Grid(worldWidth, worldHeight);
 
     ctxTemp.beginPath();
     ctxTemp.strokeStyle = "#ccc"; //#ccc
     for (var i = 0; i < worldWidth; i++) {
+        grid[i] = [];
         for(var j = 0; j<worldHeight;j++){
 
             /* Initialize arrays */
-        grid[i,j] = {};
-        grid[i,j].block = 0;
-
+       // grid[i,j] = {};
+       // grid[i,j].block = 0;
+       grid[i][j] = {};
+       grid[i][j].block = 0;
         pfGrid.setWalkableAt(i, j, true);
 
          //draw grid
@@ -93,7 +95,31 @@ function drawGrid(){
         ctxTemp.lineTo(size * i, size*(j+1));
         }
     }
+    console.dir(grid);
     ctxTemp.stroke();    
+
+}
+
+function redrawMap(){
+    ctxTemp.clearRect(0, 0, canvas.width, canvas.height);
+    ctxTemp.beginPath();
+    ctxTemp.strokeStyle = "#ccc"; //#ccc
+    for (var i = 0; i < worldWidth; i++) {
+        for(var j = 0; j<worldHeight;j++) {
+            //draw grid
+            ctxTemp.moveTo(size * i,size * j);
+            ctxTemp.lineTo(size * (i+1), size*j);
+            ctxTemp.moveTo(size * i, size * j);
+            ctxTemp.lineTo(size * i, size*(j+1));
+
+            //Draw block
+            if(grid[i][j].block != 0){
+                ctxTemp.fillStyle = blockColor(grid[i,j].block);
+                ctxTemp.fillRect(i*size, j*size, size, size);
+            }
+        }
+    }
+    ctxTemp.stroke();
 
 }
 
@@ -137,7 +163,9 @@ var setEventHandlers = function() {
     socket.on("move player", onMovePlayer);
     socket.on("remove player", onRemovePlayer);
     
-    socket.on("build wall", onBuildWall);
+    socket.on("build block", onBuildBlock);
+    socket.on("destroy block", onDestroyBlock);
+
 
 };
 
@@ -170,45 +198,43 @@ function onResize(e) {
 };
 
 function onMouseUp(e){
-    //console.log("Mouse Up "+e.x+", "+e.y);
-    //console.dir(e);
-    //if(e.button == 2){ //rightclick, cancel build
         buildmode = false;
-        return;
-    //}
+
 }
+
+
+function buildBlock(e, type){
+
+    var block = blockAt(e.x, e.y);
+    onBuildBlock(block);
+    socket.emit("build block", block);
+
+}
+
 
 function onMouseDown(e){
     //console.log("Mouse down "+e.x+", "+e.y);
-    if(e.button == 0){
+    //console.log("block check ("+ e.x+","+ e.y+") "+blockAt(e.x, e.y));
+    if(e.button != 0)
+        return;
+
+    // Clicked empty block
+    if( blockAt(e.x, e.y).type == 0){
         buildmode = true;
-    buildWall.x = Math.round( (e.x-(size/2)) / size);
-    buildWall.y = Math.round( (e.y-(size/2)) / size);
-    //console.log("clicked: "+buildWall.x+","+buildWall.y);
-    buildWall.block = 1;
-    onBuildWall(buildWall);
-    socket.emit("build wall", {x:buildWall.x, y:buildWall.y, type:1}); 
-    return;
+        buildBlock(e, 1);
+    }else {
+        //Clicked existing wall, remove it.
+        socket.emit("destroy block", blockAt(e.x, e.y))
+        onDestroyBlock(blockAt(e.x, e.y));;
     }
-       // buildWall.x2 = (e.x);
-        //buildWall.y2 = (e.y);
-        //socket.emit("build wall", {x:buildWall.x,y:buildWall.y,x2:buildWall.x2,y2:buildWall.y2});
-        //onBuildWall(buildWall);
-        //buildWall.x = -1;  
-        //buildmode = false; 
 
 }
 function onMouseMove(e){
-
-    if(buildmode){
-        buildWall.x = Math.round( (e.x-(size/2)) / size);
-        buildWall.y = Math.round( (e.y-(size/2)) / size);
-        buildWall.block = 1;
-        //console.log("Mousemove: "+buildWall.x+","+buildWall.y);
-        onBuildWall(buildWall);
-        socket.emit("build wall", {x:buildWall.x, y:buildWall.y, type:1});
+    if(!buildmode)
         return;
-    }
+        //@TODO: check what type of block to build.
+        buildBlock(e, 1);
+
 }
 
 
@@ -241,27 +267,55 @@ function onMovePlayer(data) {
     player.setY(data.y);
 };
 
-//Construct wall
-function onBuildWall(data){
-    grid[data.x, data.y].block = data.block;
-    ctxTemp.fillStyle = "#F2AA0F";
+/* Returns object with x, y, and type. representing block at x,y */
+function blockAt(x,y){
+    var block = {};
+    block.x = Math.round( (x-(size/2)) / size);
+    block.y = Math.round( (y-(size/2)) / size);
+    block.type = grid[block.x][block.y].block;
+    //console.log("Checking" +Math.round( (x-(size/2)) / size), Math.round( (y-(size/2)) / size));
+    return block;
+}
+
+// Returns block type at mouse x,y
+function blockTypeAt(x,y){
+    //console.log("Checking" +Math.round( (x-(size/2)) / size), Math.round( (y-(size/2)) / size));
+    return grid[Math.round( (x-(size/2)) / size)][Math.round( (y-(size/2)) / size)].block;
+}
+
+
+
+function blockColor(type){
+    switch(type){
+        case 1:     //Wall
+            return "#61412C";
+            break;
+        case 2:     // Door
+            return "#D98484";
+            break;
+        default:
+           return "#61412C";
+            break;
+    }
+}
+
+
+//Construct block. wall = 1, door = 2
+function onBuildBlock(data){
+    grid[data.x][data.y].block = data.block;
+    ctxTemp.fillStyle = blockColor(data.block);
     ctxTemp.fillRect(data.x*size, data.y*size, 20, 20);
-
     pfGrid.setWalkableAt(data.x, data.y, false);
-
-    //Backup pfGrid
-    pfGridBackup = pfGrid.clone();
-
-    //Calculate new npc path
-    currentPath = finder.findPath(10, 10, Math.round(localPlayer.getX()/size), Math.round(localPlayer.getY()/size), pfGrid);
-
-    //Restore grid
-    pfGrid = pfGridBackup.clone();
-
+    generatePath();
 }
-function onDestroyWall(data){
-    grid[data.x,data.y].block = 0;
+function onDestroyBlock(data){
+    grid[data.x][data.y].block = 0;
+    pfGrid.setWalkableAt(data.x, data.y, true);
+    redrawMap();
+    generatePath();
 }
+
+
 
 function onRemovePlayer(data) {
     //Find player by id
@@ -339,6 +393,16 @@ function draw() {
 
 
 /** HELPER FUNCTIONS */
+
+function generatePath(){
+    //Backup pfGrid
+    pfGridBackup = pfGrid.clone();
+    //Calculate new npc path
+    currentPath = finder.findPath(10, 10, Math.round(localPlayer.getX()/size), Math.round(localPlayer.getY()/size), pfGrid);
+    //Restore grid
+    pfGrid = pfGridBackup.clone();
+}
+
 function playerById(id){
     for(var i=0;i<remotePlayers.length;i++){
         if(remotePlayers[i].id == id)

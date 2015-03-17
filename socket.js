@@ -20,7 +20,8 @@ module.exports = function (io) {
         client.on("disconnect", onClientDisconnect);
         client.on("new player", onNewPlayer);
         client.on("move player", onMovePlayer);
-        client.on("build wall", onBuildWall);
+        client.on("build block", onBuildBlock);
+        client.on("destroy block", onDestroyBlock);
     }
 
     function onClientDisconnect(){
@@ -66,11 +67,16 @@ module.exports = function (io) {
 
     }
 
-    /* Build Wall */
-    function onBuildWall(data){
+    /* Build Block */
+    function onBuildBlock(data){
     
-    //Broadcast to everyone that a wall is built.
-    this.broadcast.emit("build wall", data);
+    //Broadcast to everyone that a block is built.
+    this.broadcast.emit("build block", data);
+    }
+
+    /* Destroy block */
+    function onDestroyBlock(data){
+        this.broadcast.emit("destroy block", data);
     }
 
     /** Helper functions */
