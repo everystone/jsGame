@@ -1,13 +1,23 @@
 Player = require('./player').Player;
-
+PF = require('pathfinding'); //pathfinding.js
 module.exports = function (io) {
   'use strict';
 
-    var players;
+    var players, level, worldWidth, worldHeight;
+
+    //Pathfinding
+    var finder, pfGrid, pfGridClone;
 
     function init(){
-        players = [];
+        /* Setup vars */
 
+        players = [];
+        level = [];
+        worldWidth = 50;
+        worldHeight = 30;
+        finder = new PF.AStarFinder();
+        //Init level and pathfinding grid.
+        generateLevel();
         console.log("Socket init");
         setEventHandlers();
     }
@@ -15,8 +25,25 @@ module.exports = function (io) {
         io.on("connection", onSocketConnection);
     };
 
+    var generateLevel = function(){
+            //generate grid
+            pfGrid = new PF.Grid(worldWidth, worldHeight);
+
+            /* Create a new *Empty* Map */
+            for (var i = 0; i < worldWidth; i++) {
+                level[i] = [];
+                for(var j = 0; j<worldHeight;j++){
+                    level[i][j] = {};
+                    level[i][j].block = 0;
+                    pfGrid.setWalkableAt(i, j, true);
+                    }
+                }
+    };
+    
     function onSocketConnection(client){
         console.log("New player has connected: "+client.id);
+
+        /* socket events from clients */
         client.on("disconnect", onClientDisconnect);
         client.on("new player", onNewPlayer);
         client.on("move player", onMovePlayer);
@@ -51,12 +78,16 @@ module.exports = function (io) {
             existingPlayer = players[i];
             this.emit("new player", {id: existingPlayer.id, x: existingPlayer.getX(),y: existingPlayer.getY()});
         }
+        
+        //Send the map
+        this.emit("level update", level);
+        
         players.push(newPlayer);
     }
 
     /* MOVE PLAYER */
     function onMovePlayer(data){
-        var player = playerById(this.id); //@TODO this.id or data.id ?
+        var player = playerById(this.id);
         if(!player){ console.log("ERROR: player not found: "+this.id); return;}
 
         player.setX(data.x);
@@ -65,17 +96,22 @@ module.exports = function (io) {
         //Tell others that player moved
         this.broadcast.emit('move player', {id: player.id, x: player.getX(), y: player.getY()});
 
+        //Test pathfinding
+        this.emit("path test", pathToPos(data.x, data.y));
     }
 
     /* Build Block */
     function onBuildBlock(data){
-    
+    level[data.x][data.y].block = data.block; //update level grid
+    pfGrid.setWalkableAt(data.x, data.y, false); //update pathfinding grid
     //Broadcast to everyone that a block is built.
     this.broadcast.emit("build block", data);
     }
 
     /* Destroy block */
     function onDestroyBlock(data){
+        level[data.x][data.y].block = 0;
+        pfGrid.setWalkableAt(data.x, data.y, true);
         this.broadcast.emit("destroy block", data);
     }
 
@@ -91,6 +127,19 @@ module.exports = function (io) {
         }
         return false;
     }
+
+    /* Pathfinding */
+    function pathToPos(x, y){
+        var size = 20; // grid size
+        //Backup pfGrid
+        pfGridClone = pfGrid.clone();
+        //Calculate new npc path
+        var path = finder.findPath(10, 10, Math.round(x/size), Math.round(y/size), pfGrid);
+        //Restore grid
+        pfGrid = pfGridClone.clone();
+        return path;
+    }
+
     init();
 
 };
