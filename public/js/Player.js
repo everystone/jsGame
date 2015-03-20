@@ -86,15 +86,12 @@ function collision(x, y) {
         var clipOffset = 0;
         var whatColor = ctx.getImageData(x + clipOffset, y + clipOffset, clipWidth, clipDepth);
 
-        // Loop through the clip and see if you find red or blue. 
         for (var i = 0; i < clipLength * 4; i += 4) {
          //console.log(whatColor.data[i]);
          if (whatColor.data[i] == 97) { //242
            // alert("red");
             return true;
-            break;
           }
-          // Fourth element is alpha and we don't care. 
         }
         return false;
       }

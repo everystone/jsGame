@@ -3,7 +3,12 @@ PF = require('pathfinding'); //pathfinding.js
 module.exports = function (io) {
   'use strict';
 
-    var players, level, worldWidth, worldHeight;
+  /*
+   * Timer: flood the world, using path to center of map?
+   * Color flooded tiles blue on client. Seperate array.
+   */
+    
+  var players, level, worldWidth, worldHeight;
 
     //Pathfinding
     var finder, pfGrid, pfGridClone;
@@ -12,9 +17,10 @@ module.exports = function (io) {
         /* Setup vars */
 
         players = [];
-        level = [];
+        level = []; //Level array. 0 = empty, 1 = wall, 2 = water?
         worldWidth = 50;
         worldHeight = 30;
+        
         finder = new PF.AStarFinder();
         //Init level and pathfinding grid.
         generateLevel();
@@ -97,7 +103,7 @@ module.exports = function (io) {
         this.broadcast.emit('move player', {id: player.id, x: player.getX(), y: player.getY()});
 
         //Test pathfinding
-        this.emit("path test", pathToPos(data.x, data.y));
+       // this.emit("path test", pathToPos(Math.round(data.x/size), Math.round(data.y/size)));
     }
 
     /* Build Block */
@@ -129,17 +135,40 @@ module.exports = function (io) {
     }
 
     /* Pathfinding */
-    function pathToPos(x, y){
+    function pathToPos(from, to){
         var size = 20; // grid size
         //Backup pfGrid
         pfGridClone = pfGrid.clone();
-        //Calculate new npc path
-        var path = finder.findPath(10, 10, Math.round(x/size), Math.round(y/size), pfGrid);
+        //Calculate new npc path ( this operation wrecks the grid )
+        var path = finder.findPath(from[0], from[1], to[0], to[1], pfGrid);
         //Restore grid
         pfGrid = pfGridClone.clone();
         return path;
     }
 
+    /* Flood the map */
+    function flood(current){
+    // is called every x seconds.
+    // Flood the level, continue path from last water-square.
+    if(typeof(current) === 'undefined')
+        return;
+
+     var path = pathToPos(current, [worldWidth/2,worldHeight/2]); // center of level
+     //return path[1]; //next step towards center
+    
+     console.log("next: "+path[1]);
+
+     //broadcast to clients
+     var block = {};
+     block.x = path[1][0];
+     block.y = path[1][1];
+     block.block = 3;
+
+     io.sockets.emit('build block', block); //send to all clients
+     setTimeout(function(){ flood(path[1]) }, 1000);
+    }
+
     init();
+    flood([0,0]);
 
 };

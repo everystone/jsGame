@@ -95,9 +95,10 @@ function redrawMap(){
 *  currentPath is array of coordinates containing current path to player, sent from server.
  */
 function drawPath(ctx){
-    ctx.beginPath();
+
    // ctx.fillStyle = "#E8E676"; //#ccc
-    ctx.moveTo(10, 10); //enemy spawn
+    ctx.moveTo(5, 5); //enemy spawn
+    ctx.beginPath();
     for(i =0;i<currentPath.length;i++){
 
         var x,y;
@@ -172,20 +173,18 @@ function onMouseUp(e){
 }
 
 function onMouseDown(e){
-    //console.log("Mouse down "+e.x+", "+e.y);
-    //console.log("block check ("+ e.x+","+ e.y+") "+blockAt(e.x, e.y));
     if(e.button != 0)
         return;
     var mouse = {};
     mouse.x = e.x - canvas.offsetLeft;
     mouse.y = e.y - canvas.offsetTop;
-    // Clicked empty block
-    if( blockAt(mouse.x, mouse.y).type == 0){
+
+    if( blockAt(mouse.x, mouse.y).type == 0){// Clicked empty block
         buildmode = true;
         buildBlock(mouse, 1);
     }else {
         //Clicked existing wall, remove it.
-        socket.emit("destroy block", blockAt(mouse.x, mouse.y))
+        socket.emit("destroy block", blockAt(mouse.x, mouse.y)) //tell server
         onDestroyBlock(blockAt(mouse.x, mouse.y));;
     }
 
@@ -341,6 +340,9 @@ function blockColor(type){
             break;
         case 2:     // Door
             return "#D98484";
+            break;
+        case 3:     // Water
+            return "#5156DB";
             break;
         default:
            return "#61412C";
